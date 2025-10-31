@@ -1,4 +1,5 @@
 using System.Reflection;
+using CarAssignment.Application.Configuration;
 using CarAssignment.Application.CQRS.Command.AllocateVehicleCommand;
 using CarAssignment.Application.Extensions;
 using CarAssignment.Infrastructure.Extensions;
@@ -14,6 +15,9 @@ builder.Services.AddInfrastructure();
 builder.Services.AddControllers();
 builder.Services.AddApplicationServices();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(AllocateVehicleCommand).GetTypeInfo().Assembly));
+
+builder.Services.Configure<ParkingConfiguration>(
+    builder.Configuration.GetSection("ParkingConfiguration"));
 
 var app = builder.Build();
 
