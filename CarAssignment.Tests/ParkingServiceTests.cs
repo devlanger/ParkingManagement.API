@@ -1,6 +1,5 @@
 using CarAssignment.Application.Configuration;
 using CarAssignment.Application.Services;
-using CarAssignment.Core;
 using CarAssignment.Core.Abstractions;
 using CarAssignment.Core.Data;
 using CarAssignment.Core.Data.Enums;
@@ -26,32 +25,51 @@ public class ParkingServiceTests : TestBase
 
         _parkingConfiguration = Options.Create(new ParkingConfiguration()
         {
-            ParkingSlotCount = 5,
-            PaymentIntervalInSeconds = 1
+            ParkingSlotCount = 5
         });
         
         _parkingService = new ParkingService(carRepositoryMock.Object,
             parkingSlotRepositoryMock.Object,
             _parkingConfiguration);
+        
+        SeedParkingSlots();
+    }
+
+    private void SeedParkingSlots()
+    {
+        var parkingSlots = new List<ParkingSlot>();
+        for (var i = 0; i < _parkingConfiguration.Value.ParkingSlotCount; i++)
+        {
+            parkingSlots.Add(new ParkingSlot());
+        }
+        
+        SeedEntities(parkingSlots.ToArray());
     }
     
     [Fact]
     public async Task ThrowException_WhenAddingExistingCar()
     {
-        SeedEntities(new Car
+        var car = new Car
         {
             RegistrationNumber = "test",
             VehicleType = VehicleType.LARGE_CAR,
             ParkingEnterTime = DateTimeOffset.UtcNow
+        };
+        SeedEntities(car);
+        SeedEntities(new ParkingSlot()
+        {
+            CarId = car.Id
         });
         
         await Assert.ThrowsAsync<ConflictException>(() => 
-            _parkingService.AllocateCarAsync("test", It.IsAny<VehicleType>()));
+            _parkingService.AllocateCarAsync("test", VehicleType.LARGE_CAR));
     }
     
     [Fact]
     public async Task ThrowException_WhenRemovingNonExistingCar()
     {
+        ClearEntities<Car>();
+
         SeedEntities(new Car
         {
             RegistrationNumber = "test",
@@ -66,6 +84,8 @@ public class ParkingServiceTests : TestBase
     [Fact]
     public async Task ThrowException_WhenNoAvailableSpace()
     {
+        ClearEntities<Car>();
+
         var entities = new List<Car>();
         for (var i = 0; i < _parkingConfiguration.Value.ParkingSlotCount; i++)
         {
@@ -85,6 +105,7 @@ public class ParkingServiceTests : TestBase
 
     public override void Dispose()
     {
+        ClearEntities<ParkingSlot>();
         ClearEntities<Car>();
         base.Dispose();
     }

@@ -32,7 +32,7 @@ public class ParkingService(
         car.VehicleType = vehicleType;
         car.ParkingEnterTime = DateTimeOffset.UtcNow;
 
-        await carRepository.AddAsync(car);
+        await carRepository.AddAsync(car);  
 
         freeParkingSlot.Car = car;
         freeParkingSlot.CarId = car.Id;
