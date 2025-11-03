@@ -1,4 +1,3 @@
-using System.Reflection;
 using CarAssignment.Application.Configuration;
 using CarAssignment.Application.CQRS.Command.AllocateVehicleCommand;
 using CarAssignment.Application.Extensions;
@@ -11,15 +10,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddApplicationServices();
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(AllocateVehicleCommand).GetTypeInfo().Assembly));
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(AllocateVehicleCommandHandler).Assembly)
+);
 
 builder.Services.Configure<ParkingConfiguration>(
     builder.Configuration.GetSection("ParkingConfiguration"));
 
 var app = builder.Build();
+
+await app.Services.AddMigrations();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

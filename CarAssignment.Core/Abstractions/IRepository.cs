@@ -1,10 +1,12 @@
-﻿namespace CarAssignment.Infrastructure;
+﻿using Microsoft.EntityFrameworkCore;
 
-public interface IRepository<T>
+namespace CarAssignment.Infrastructure;
+
+public interface IRepository<T> where T : class
 {
-    public void Add(T entity);
-    public void Update(T entity);
-    public void Delete(T entity);
-    public Task<T?> GetByIdAsync(string id);
-    public IQueryable<T> GetAll();
+    Task AddAsync(T entity);
+    Task UpdateAsync(T entity);
+    void Delete(T entity);
+    Task<T?> GetByIdAsync(string id);
+    IQueryable<T> Query();
 }

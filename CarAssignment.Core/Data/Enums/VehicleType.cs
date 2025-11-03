@@ -1,4 +1,4 @@
-namespace CarAssignment.Core;
+namespace CarAssignment.Core.Data.Enums;
 
 public enum VehicleType
 {

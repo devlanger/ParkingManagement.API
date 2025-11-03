@@ -2,6 +2,7 @@
 using CarAssignment.Core.Abstractions;
 using CarAssignment.Core.Data;
 using CarAssignment.Infrastructure;
+using CarAssignment.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CarAssignment.Application.Extensions;
@@ -12,7 +13,6 @@ public static class ApplicationExtensions
     {
         services.AddTransient<IPaymentService, PaymentService>();
         services.AddTransient<IParkingService, ParkingService>();
-        services.AddTransient<IRepository<Car>, ParkingDatabaseContext>();
-
+        services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
     }
 }

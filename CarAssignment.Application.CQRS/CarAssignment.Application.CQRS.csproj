@@ -11,10 +11,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Queries\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\CarAssignment.Core\CarAssignment.Core.csproj" />
       <ProjectReference Include="..\CarAssignment.Infrastructure\CarAssignment.Infrastructure.csproj" />
     </ItemGroup>

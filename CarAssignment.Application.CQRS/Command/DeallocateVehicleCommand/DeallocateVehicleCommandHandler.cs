@@ -1,19 +1,25 @@
-﻿using CarAssignment.Core.Abstractions;
-using CarAssignment.Core.Data;
+﻿using CarAssignment.Application.CQRS.Models;
+using CarAssignment.Core.Abstractions;
+using CarAssignment.Core.Exceptions;
 using MediatR;
 
 namespace CarAssignment.Application.CQRS.Command.DeallocateVehicleCommand;
 
-public class DeallocateVehicleCommandHandler(IParkingService parkingService, IPaymentService paymentService) : IRequestHandler<DeallocateVehicleCommand>
+public class DeallocateVehicleCommandHandler(IParkingService parkingService, IPaymentService paymentService)
+    : IRequestHandler<DeallocateVehicleCommand, DeallocateVehicleCommandResponse>
 {
-    public async Task Handle(DeallocateVehicleCommand request, CancellationToken cancellationToken)
+    public async Task<DeallocateVehicleCommandResponse> Handle(DeallocateVehicleCommand request, CancellationToken cancellationToken)
     {
-        Car c = null;
-        if(c == null)
-            throw new NullReferenceException($"Couldn't non existing deallocate vehicle {request.VehicleRegistration}");
+        var c = await parkingService.GetParkedCarByRegistrationAsync(request.VehicleRegistration);
+        if(c is null)
+            throw new NotFoundException($"Vehicle with registration: {request.VehicleRegistration} not found.");
+
+        var car = await parkingService.DeallocateCarAsync(request.VehicleRegistration);
+        var chargeAmount = await paymentService.ChargeCar(car);
         
-        paymentService.Charge(c, parkingService.GetAmountForParking(c));
-        
-        await parkingService.DeallocateCar(request.VehicleRegistration);
+        return new DeallocateVehicleCommandResponse(car.RegistrationNumber,
+            chargeAmount,
+            car.ParkingEnterTime,
+            car.ParkingExitTime.GetValueOrDefault());
     }
 }

@@ -1,8 +1,12 @@
+using CarAssignment.Core.Data.Enums;
+
 namespace CarAssignment.Core.Data;
 
-public abstract class Car : Vehicle
+public class Car : BaseEntity
 {
     public string RegistrationNumber { get; set; }
+    public VehicleType VehicleType { get; set; }
     public DateTimeOffset ParkingEnterTime { get; set; }
-    public virtual double PricePerMinute { get; }
+    public DateTimeOffset? ParkingExitTime { get; set; }
+    public double? ChargeAmount { get; set; }
 }
