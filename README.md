@@ -6,7 +6,7 @@
 - Run API with command:
   - ```dotnet run -c Release -p .\CarAssignment\```
 - Go onto API url: 
-  - http://localhost:5008
+  - http://localhost:5008/swagger/index.html
 - Enjoy the API and test endpoints.
 
 **2. Adding Migrations:**
