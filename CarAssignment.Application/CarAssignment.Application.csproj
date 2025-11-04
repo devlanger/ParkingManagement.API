@@ -8,7 +8,6 @@
 
     <ItemGroup>
       <PackageReference Include="MediatR" Version="13.1.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.0" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.10" />
     </ItemGroup>
 
@@ -17,5 +16,4 @@
       <ProjectReference Include="..\CarAssignment.Core\CarAssignment.Core.csproj" />
       <ProjectReference Include="..\CarAssignment.Infrastructure\CarAssignment.Infrastructure.csproj" />
     </ItemGroup>
-
 </Project>

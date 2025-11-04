@@ -1,5 +1,4 @@
-﻿using CarAssignment.Core;
-using CarAssignment.Core.Data.Enums;
+﻿using CarAssignment.Core.Data.Enums;
 using MediatR;
 
 namespace CarAssignment.Application.CQRS.Command.AllocateVehicleCommand;

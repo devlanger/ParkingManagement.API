@@ -1,6 +1,5 @@
 ﻿using CarAssignment.Application.Services;
 using CarAssignment.Core.Abstractions;
-using CarAssignment.Core.Data;
 using CarAssignment.Infrastructure;
 using CarAssignment.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;

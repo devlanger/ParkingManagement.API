@@ -1,6 +1,7 @@
 using CarAssignment.Application.Configuration;
 using CarAssignment.Application.CQRS.Command.AllocateVehicleCommand;
 using CarAssignment.Application.Extensions;
+using CarAssignment.ExceptionHandlers;
 using CarAssignment.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,8 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
+builder.Services.AddLogging();
 builder.Services.AddApplicationServices();
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(AllocateVehicleCommandHandler).Assembly)
@@ -32,6 +36,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseExceptionHandler((x) => {});
 
 app.MapControllers().WithOpenApi();
 app.Run();
