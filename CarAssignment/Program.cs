@@ -1,5 +1,6 @@
 using CarAssignment.Application.Configuration;
 using CarAssignment.Application.CQRS.Command.AllocateVehicleCommand;
+using CarAssignment.Application.CQRS.Extensions;
 using CarAssignment.Application.Extensions;
 using CarAssignment.ExceptionHandlers;
 using CarAssignment.Infrastructure.Extensions;
@@ -12,14 +13,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddApplicationCqrsServices();
 builder.Services.AddProblemDetails();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddLogging();
 builder.Services.AddApplicationServices();
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(AllocateVehicleCommandHandler).Assembly)
-);
+{
+    cfg.RegisterServicesFromAssembly(typeof(AllocateVehicleCommandHandler).Assembly);
+});
 
 builder.Services.Configure<ParkingConfiguration>(
     builder.Configuration.GetSection("ParkingConfiguration"));
