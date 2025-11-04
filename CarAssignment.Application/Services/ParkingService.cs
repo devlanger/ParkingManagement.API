@@ -12,8 +12,7 @@ namespace CarAssignment.Application.Services;
 
 public class ParkingService(
     IRepository<Car> carRepository,
-    IRepository<ParkingSlot> parkingSlotRepository,
-    IOptions<ParkingConfiguration> parkingConfiguration) : IParkingService
+    IRepository<ParkingSlot> parkingSlotRepository) : IParkingService
 {
     public async Task<Car> AllocateCarAsync(string vehicleReg, VehicleType vehicleType)
     {

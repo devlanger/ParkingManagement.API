@@ -29,8 +29,7 @@ public class ParkingServiceTests : TestBase
         });
         
         _parkingService = new ParkingService(carRepositoryMock.Object,
-            parkingSlotRepositoryMock.Object,
-            _parkingConfiguration);
+            parkingSlotRepositoryMock.Object);
         
         SeedParkingSlots();
     }
