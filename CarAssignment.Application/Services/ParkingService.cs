@@ -1,5 +1,4 @@
-﻿using CarAssignment.Application.Configuration;
-using CarAssignment.Core.Abstractions;
+﻿using CarAssignment.Core.Abstractions;
 using CarAssignment.Core.Data;
 using CarAssignment.Core.Data.Enums;
 using CarAssignment.Core.Exceptions;

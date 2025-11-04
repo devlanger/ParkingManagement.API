@@ -1,7 +1,7 @@
-using CarAssignment.Application.Configuration;
 using CarAssignment.Application.CQRS.Command.AllocateVehicleCommand;
 using CarAssignment.Application.CQRS.Extensions;
 using CarAssignment.Application.Extensions;
+using CarAssignment.Core.Configuration;
 using CarAssignment.ExceptionHandlers;
 using CarAssignment.Infrastructure.Extensions;
 
