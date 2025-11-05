@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: CarAssignment.API/Dockerfile
+    container_name: carassignment-api
+    ports:
+      - "8080:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=CarAssignmentDb;User Id=sa;Password=StrongPassword123!;TrustServerCertificate=True;
+    depends_on:
+      - db
+    networks:
+      - carassignment-net
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: carassignment-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=StrongPassword123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - carassignment-db-data:/var/opt/mssql
+    networks:
+      - carassignment-net
+
+networks:
+  carassignment-net:
+
+volumes:
+  carassignment-db-data:
