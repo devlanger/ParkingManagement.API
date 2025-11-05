@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CarAssignment.ExceptionHandlers;
+namespace CarAssignment.API.ExceptionHandlers;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {

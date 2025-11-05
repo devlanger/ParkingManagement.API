@@ -5,7 +5,6 @@ using CarAssignment.Core.Exceptions;
 using CarAssignment.Core.Factories;
 using CarAssignment.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace CarAssignment.Application.Services;
 

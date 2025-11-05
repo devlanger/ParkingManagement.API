@@ -1,13 +1,11 @@
 ﻿using CarAssignment.Application.CQRS.Command.AllocateVehicleCommand;
 using CarAssignment.Application.CQRS.Command.DeallocateVehicleCommand;
 using CarAssignment.Application.CQRS.Queries.GetParkingSpacesQuery;
-using CarAssignment.Core;
 using CarAssignment.Core.Data.Enums;
-using CarAssignment.Core.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CarAssignment.Controllers;
+namespace CarAssignment.API.Controllers;
 
 [ApiController]
 [Route("parking")]

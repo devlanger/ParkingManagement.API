@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarAssignment", "CarAssignment\CarAssignment.csproj", "{917C22CA-26DB-467C-AEEB-A59A93CB023E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarAssignment.API", "CarAssignment.API\CarAssignment.API.csproj", "{917C22CA-26DB-467C-AEEB-A59A93CB023E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarAssignment.Core", "CarAssignment.Core\CarAssignment.Core.csproj", "{B770FE27-648A-4F6B-9A87-60DAD7629CC9}"
 EndProject
