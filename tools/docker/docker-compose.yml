@@ -8,7 +8,10 @@ services:
     container_name: carassignment-api
     ports:
       - "8080:8080"
+      - "8443:443"
     environment:
+      - ASPNETCORE_URLS=https://+:443;http://+:8080
+      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=db;Database=CarAssignmentDb;User Id=sa;Password=StrongPassword123!;TrustServerCertificate=True;
     depends_on:
       - db

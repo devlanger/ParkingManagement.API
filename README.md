@@ -6,13 +6,13 @@ A lightweight and extensible API for managing parking spots, cars, and assignmen
 
 ## 🧭 1. How to Run the Program
 
-### ✅ Prerequisites
+### ✅ 1.1 Prerequisites
 Before you start, ensure you have the following installed:
 - [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download)
 - [Entity Framework Core Tools](https://docs.microsoft.com/en-us/ef/core/cli/dotnet)
 - (Optional) A database engine such as **SQL Server**, **PostgreSQL**, or **SQLite**, depending on your configuration.
 
-### ▶️ Steps to Run
+### ▶️ 1.2 Steps to Run locally
 
 1. Clone the repository and navigate to the root directory.
 2. Run the API using:
@@ -25,11 +25,26 @@ Before you start, ensure you have the following installed:
    ```
 4. You’ll be greeted by the **Swagger UI**, where you can explore and test all available API endpoints interactively.
 
+### ▶️ 1.3 Docker Support
+You can also run it in docker using docker-compose file:
+1. Go to tools/docker folder in terminal
+2. run command:
+   ```
+   docker compose up -d
+   ```
+3. Wait for docker compose to spin up container instances
+4. Go to url:
+   ```
+   http://localhost:8080/swagger/index.html
+   ```
+5. Try endpoints.
+
 ---
 
 ## 🗃️ 2. Database Migrations
 
-This project uses **Entity Framework Core Code-First Migrations** for database schema management.
+This project uses **Entity Framework Core Code-First Migrations** for database schema management. 
+These will pick up on application start.
 
 ### ➕ Add a New Migration
 ```bash
