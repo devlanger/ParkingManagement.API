@@ -20,69 +20,47 @@ public class ParkingService(
 {
     public async Task<Car> AllocateCarAsync(string vehicleReg, VehicleType vehicleType, CancellationToken cancellationToken)
     {
-        await using var transaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+        var parkingSlotForCar = await GetParkingSlotAsync(vehicleReg);
+        var freeParkingSlot = await GetFreeParkingSlotAsync();
 
-        try
-        {
-            var parkingSlotForCar = await GetParkingSlotAsync(vehicleReg);
-            var freeParkingSlot = await GetFreeParkingSlotAsync();
+        if (freeParkingSlot is null)
+            throw new NotAvailableSpaceException();
 
-            if (freeParkingSlot is null)
-                throw new NotAvailableSpaceException();
+        if (parkingSlotForCar is not null)
+            throw new ConflictException($"There is already parked car with vehicle registration: {vehicleReg}");
 
-            if (parkingSlotForCar is not null)
-                throw new ConflictException($"There is already parked car with vehicle registration: {vehicleReg}");
+        var car = CarFactory.CreateCar(vehicleType);
+        car.RegistrationNumber = vehicleReg;
+        car.VehicleType = vehicleType;
+        car.ParkingEnterTime = DateTimeOffset.UtcNow;
+        var availableCapacity = GetAvailableCapacity();
+        car.ChargeAdditional = availableCapacity < parkingConfiguration.Value.AdditionalChargeParkingSlotsAmount;
 
-            var car = CarFactory.CreateCar(vehicleType);
-            car.RegistrationNumber = vehicleReg;
-            car.VehicleType = vehicleType;
-            car.ParkingEnterTime = DateTimeOffset.UtcNow;
-            var availableCapacity = GetAvailableCapacity();
-            car.ChargeAdditional = availableCapacity < parkingConfiguration.Value.AdditionalChargeParkingSlotsAmount;
+        await carRepository.AddAsync(car);  
 
-            await carRepository.AddAsync(car);  
+        freeParkingSlot.Car = car;
+        freeParkingSlot.CarId = car.Id;
 
-            freeParkingSlot.Car = car;
-            freeParkingSlot.CarId = car.Id;
-
-            await parkingSlotRepository.UpdateAsync(freeParkingSlot);
-            
-            await transaction.CommitAsync(cancellationToken);
-            return car;
-        }
-        catch (Exception e)
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+        await parkingSlotRepository.UpdateAsync(freeParkingSlot);
+        
+        return car;
     }
     
     public async Task<Car> DeallocateCarAsync(string vehicleRegistration, CancellationToken cancellationToken)
     {
-        await using var transaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+        var occupiedParkingSlot = await GetParkingSlotAsync(vehicleRegistration);
 
-        try
-        {
-            var occupiedParkingSlot = await GetParkingSlotAsync(vehicleRegistration);
+        if (occupiedParkingSlot?.Car is null)
+            throw new NotFoundException($"Parking slot for a car: {vehicleRegistration} not found.");
 
-            if (occupiedParkingSlot?.Car is null)
-                throw new NotFoundException($"Parking slot for a car: {vehicleRegistration} not found.");
-
-            var parkedCar = occupiedParkingSlot.Car;
-            occupiedParkingSlot.Car.ParkingExitTime = DateTimeOffset.UtcNow;
-            await carRepository.UpdateAsync(occupiedParkingSlot.Car);
+        var parkedCar = occupiedParkingSlot.Car;
+        occupiedParkingSlot.Car.ParkingExitTime = DateTimeOffset.UtcNow;
+        await carRepository.UpdateAsync(occupiedParkingSlot.Car);
+    
+        occupiedParkingSlot.CarId = null;
+        await parkingSlotRepository.UpdateAsync(occupiedParkingSlot);
         
-            occupiedParkingSlot.CarId = null;
-            await parkingSlotRepository.UpdateAsync(occupiedParkingSlot);
-            
-            await transaction.CommitAsync(cancellationToken);
-            return parkedCar;
-        }
-        catch (Exception e)
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+        return parkedCar;
     }
     
     public int GetAvailableCapacity() => parkingSlotRepository.Query().AsNoTracking().Count(x => x.CarId == null);
