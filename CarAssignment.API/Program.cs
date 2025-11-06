@@ -18,6 +18,7 @@ builder.Configuration
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddLogging();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddApplicationCqrsServices();
@@ -37,6 +38,8 @@ builder.Services.Configure<ParkingConfiguration>(
 var app = builder.Build();
 
 await app.Services.AddMigrations();
+
+app.UseMiddleware<RequestTimerMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
