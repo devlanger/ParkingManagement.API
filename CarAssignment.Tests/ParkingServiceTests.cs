@@ -65,7 +65,7 @@ public class ParkingServiceTests : TestBase
         });
         
         await Assert.ThrowsAsync<ConflictException>(() => 
-            _parkingService.AllocateCarAsync("test", VehicleType.LARGE_CAR));
+            _parkingService.AllocateCarAsync("test", VehicleType.LARGE_CAR, CancellationToken.None));
     }
     
     [Fact]
@@ -89,7 +89,7 @@ public class ParkingServiceTests : TestBase
         
         SeedEntities(entities.ToArray());
         
-        var allocatedCar = await _parkingService.AllocateCarAsync("test-123", VehicleType.LARGE_CAR);
+        var allocatedCar = await _parkingService.AllocateCarAsync("test-123", VehicleType.LARGE_CAR, CancellationToken.None);
         
         Assert.True(allocatedCar.ChargeAdditional);
     }
@@ -107,7 +107,7 @@ public class ParkingServiceTests : TestBase
         });
         
         await Assert.ThrowsAsync<NotFoundException>(() => 
-            _parkingService.DeallocateCarAsync("non-existing-test"));
+            _parkingService.DeallocateCarAsync("non-existing-test", CancellationToken.None));
     }
     
     [Fact]
@@ -129,7 +129,7 @@ public class ParkingServiceTests : TestBase
         SeedEntities(entities.ToArray());
         
         await Assert.ThrowsAsync<NotAvailableSpaceException>(() => 
-            _parkingService.AllocateCarAsync("test-9999", It.IsAny<VehicleType>()));
+            _parkingService.AllocateCarAsync("test-9999", It.IsAny<VehicleType>(), CancellationToken.None));
     }
 
     public override void Dispose()
