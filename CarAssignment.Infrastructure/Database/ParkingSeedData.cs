@@ -10,7 +10,7 @@ public class ParkingSeedData
             return;
 
         var parkingSlots = new List<ParkingSlot>();
-        for (var i = 0; i < 5; i++)
+        for (var i = 0; i < 10; i++)
         {
             parkingSlots.Add(new ParkingSlot());
         }

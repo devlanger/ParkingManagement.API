@@ -4,6 +4,7 @@ using CarAssignment.Core.Configuration;
 using CarAssignment.Core.Data;
 using CarAssignment.Core.Data.Enums;
 using CarAssignment.Core.Exceptions;
+using CarAssignment.Infrastructure.Database;
 using Microsoft.Extensions.Options;
 using Moq;
 
@@ -13,20 +14,25 @@ public class ParkingServiceTests : TestBase
 {
     private readonly IOptions<ParkingConfiguration> _parkingConfiguration;
 
+    private readonly Mock<ParkingDbContext> _mockParkingDbContext;
     private readonly IParkingService _parkingService;
     
     public ParkingServiceTests()
     {
         var carRepositoryMock = CreateRepositoryMock<Car>();
         var parkingSlotRepositoryMock = CreateRepositoryMock<ParkingSlot>();
+        _mockParkingDbContext = new Mock<ParkingDbContext>();
 
         _parkingConfiguration = Options.Create(new ParkingConfiguration()
         {
-            ParkingSlotCount = 5
+            ParkingSlotCount = 5,
+            AdditionalChargeParkingSlotsAmount = 5
         });
         
         _parkingService = new ParkingService(carRepositoryMock.Object,
-            parkingSlotRepositoryMock.Object);
+            parkingSlotRepositoryMock.Object,
+            _parkingConfiguration,
+            _mockParkingDbContext.Object);
         
         SeedParkingSlots();
     }
@@ -51,6 +57,7 @@ public class ParkingServiceTests : TestBase
             VehicleType = VehicleType.LARGE_CAR,
             ParkingEnterTime = DateTimeOffset.UtcNow
         };
+        
         SeedEntities(car);
         SeedEntities(new ParkingSlot()
         {
@@ -59,6 +66,32 @@ public class ParkingServiceTests : TestBase
         
         await Assert.ThrowsAsync<ConflictException>(() => 
             _parkingService.AllocateCarAsync("test", VehicleType.LARGE_CAR));
+    }
+    
+    [Fact]
+    public async Task AdditionalCharge_IsTrue_WhenAllocatingCarWithAvailableSlotAmountLessThan()
+    {
+        //Arrange
+        var availableSlotsToTakeCharge = 6;
+        
+        ClearEntities<Car>();
+
+        var entities = new List<Car>();
+        for (var i = 0; i < availableSlotsToTakeCharge; i++)
+        {
+            entities.Add(new Car
+            {
+                RegistrationNumber = $"test-{i}",
+                VehicleType = VehicleType.LARGE_CAR,
+                ParkingEnterTime = DateTimeOffset.UtcNow
+            });
+        }
+        
+        SeedEntities(entities.ToArray());
+        
+        var allocatedCar = await _parkingService.AllocateCarAsync("test-123", VehicleType.LARGE_CAR);
+        
+        Assert.True(allocatedCar.ChargeAdditional);
     }
     
     [Fact]

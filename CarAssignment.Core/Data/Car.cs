@@ -9,4 +9,5 @@ public class Car : BaseEntity
     public DateTimeOffset ParkingEnterTime { get; set; }
     public DateTimeOffset? ParkingExitTime { get; set; }
     public double? ChargeAmount { get; set; }
+    public bool ChargeAdditional { get; set; } 
 }

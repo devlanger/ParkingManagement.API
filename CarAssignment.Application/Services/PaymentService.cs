@@ -21,7 +21,8 @@ public class PaymentService(IParkingService parkingService, IRepository<Car> car
         var carChargePricePerMinute = CarFactory.CreateCarChargePricePerMinute(car.VehicleType) * totalMinutes;
         
         //Charge additional dollar every 5 minutes
-        carChargePricePerMinute += (totalMinutes % 5) * 1.0;
+        carChargePricePerMinute += (totalMinutes / 5) * 1.0;
+        
         return carChargePricePerMinute;
     }
 }
