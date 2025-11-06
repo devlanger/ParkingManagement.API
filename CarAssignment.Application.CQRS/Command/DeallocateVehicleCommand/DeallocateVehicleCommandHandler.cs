@@ -1,15 +1,19 @@
-﻿using CarAssignment.Application.CQRS.Models;
+﻿using System.Data;
+using CarAssignment.Application.CQRS.Models;
 using CarAssignment.Core.Abstractions;
 using CarAssignment.Core.Exceptions;
+using CarAssignment.Infrastructure.Database;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarAssignment.Application.CQRS.Command.DeallocateVehicleCommand;
 
 public class DeallocateVehicleCommandHandler(
     IParkingService parkingService, 
     IPaymentService paymentService, 
-    IValidator<DeallocateVehicleCommand> validator)
+    IValidator<DeallocateVehicleCommand> validator,
+    ParkingDbContext dbContext)
     : IRequestHandler<DeallocateVehicleCommand, DeallocateVehicleCommandResponse>
 {
     public async Task<DeallocateVehicleCommandResponse> Handle(DeallocateVehicleCommand request, CancellationToken cancellationToken)
@@ -19,13 +23,24 @@ public class DeallocateVehicleCommandHandler(
         var c = await parkingService.GetParkedCarByRegistrationAsync(request.VehicleRegistration);
         if(c is null)
             throw new NotFoundException($"Vehicle with registration: {request.VehicleRegistration} not found.");
-
-        var car = await parkingService.DeallocateCarAsync(request.VehicleRegistration);
-        var chargeAmount = await paymentService.ChargeCar(car);
         
-        return new DeallocateVehicleCommandResponse(car.RegistrationNumber,
-            chargeAmount,
-            car.ParkingEnterTime,
-            car.ParkingExitTime.GetValueOrDefault());
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+
+        try
+        {
+            var car = await parkingService.DeallocateCarAsync(request.VehicleRegistration, cancellationToken);
+            var chargeAmount = await paymentService.ChargeCar(car);
+            await transaction.CommitAsync(cancellationToken);
+
+            return new DeallocateVehicleCommandResponse(car.RegistrationNumber,
+                chargeAmount,
+                car.ParkingEnterTime,
+                car.ParkingExitTime.GetValueOrDefault());
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 }

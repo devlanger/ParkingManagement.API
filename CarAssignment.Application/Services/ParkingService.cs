@@ -47,12 +47,12 @@ public class ParkingService(
 
             await parkingSlotRepository.UpdateAsync(freeParkingSlot);
             
-            await transaction.CommitAsync();
+            await transaction.CommitAsync(cancellationToken);
             return car;
         }
         catch (Exception e)
         {
-            await transaction.RollbackAsync();
+            await transaction.RollbackAsync(cancellationToken);
             throw;
         }
     }
