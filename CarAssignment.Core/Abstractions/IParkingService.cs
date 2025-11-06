@@ -5,8 +5,8 @@ namespace CarAssignment.Core.Abstractions;
 
 public interface IParkingService
 { 
-    Task<Car> AllocateCarAsync(string vehicleRegistration, VehicleType vehicleType);
-    Task<Car> DeallocateCarAsync(string vehicleRegistration);
+    Task<Car> AllocateCarAsync(string vehicleRegistration, VehicleType vehicleType, CancellationToken cancellationToken);
+    Task<Car> DeallocateCarAsync(string vehicleRegistration, CancellationToken cancellationToken);
     int GetAvailableCapacity();
     int GetOccupiedCapacity();
     TimeSpan GetParkingTime(Car car);

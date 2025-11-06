@@ -13,7 +13,7 @@ public class AllocateVehicleCommandHandler(
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
         
-        var car = await parkingService.AllocateCarAsync(request.VehicleRegistration, request.VehicleType);
+        var car = await parkingService.AllocateCarAsync(request.VehicleRegistration, request.VehicleType, cancellationToken);
         var allocatedParkingSlot = await parkingService.GetParkingSlotByCarIdAsync(car.Id);
         
         if(allocatedParkingSlot == null)

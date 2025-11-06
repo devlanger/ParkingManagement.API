@@ -1,4 +1,5 @@
-﻿using CarAssignment.Core.Abstractions;
+﻿using System.Data;
+using CarAssignment.Core.Abstractions;
 using CarAssignment.Core.Configuration;
 using CarAssignment.Core.Data;
 using CarAssignment.Core.Data.Enums;
@@ -17,9 +18,9 @@ public class ParkingService(
     IOptions<ParkingConfiguration> parkingConfiguration,
     ParkingDbContext dbContext) : IParkingService
 {
-    public async Task<Car> AllocateCarAsync(string vehicleReg, VehicleType vehicleType)
+    public async Task<Car> AllocateCarAsync(string vehicleReg, VehicleType vehicleType, CancellationToken cancellationToken)
     {
-        await using var transaction = await dbContext.Database.BeginTransactionAsync();
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
         try
         {
@@ -56,9 +57,9 @@ public class ParkingService(
         }
     }
     
-    public async Task<Car> DeallocateCarAsync(string vehicleRegistration)
+    public async Task<Car> DeallocateCarAsync(string vehicleRegistration, CancellationToken cancellationToken)
     {
-        await using var transaction = await dbContext.Database.BeginTransactionAsync();
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
 
         try
         {
@@ -74,12 +75,12 @@ public class ParkingService(
             occupiedParkingSlot.CarId = null;
             await parkingSlotRepository.UpdateAsync(occupiedParkingSlot);
             
-            await transaction.CommitAsync();
+            await transaction.CommitAsync(cancellationToken);
             return parkedCar;
         }
         catch (Exception e)
         {
-            await transaction.RollbackAsync();
+            await transaction.RollbackAsync(cancellationToken);
             throw;
         }
     }
