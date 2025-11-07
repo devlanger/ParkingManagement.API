@@ -2,6 +2,7 @@
 using CarAssignment.Application.CQRS.Models;
 using CarAssignment.Core.Abstractions;
 using CarAssignment.Core.Exceptions;
+using CarAssignment.Infrastructure;
 using CarAssignment.Infrastructure.Database;
 using FluentValidation;
 using MediatR;
@@ -13,6 +14,7 @@ public class DeallocateVehicleCommandHandler(
     IParkingService parkingService, 
     IPaymentService paymentService, 
     IValidator<DeallocateVehicleCommand> validator,
+    ICarRepository carRepository,
     ParkingDbContext dbContext)
     : IRequestHandler<DeallocateVehicleCommand, DeallocateVehicleCommandResponse>
 {
@@ -20,7 +22,7 @@ public class DeallocateVehicleCommandHandler(
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
         
-        var c = await parkingService.GetParkedCarByRegistrationAsync(request.VehicleRegistration);
+        var c = await carRepository.GetParkedCarByRegistrationAsync(request.VehicleRegistration);
         if(c is null)
             throw new NotFoundException($"Vehicle with registration: {request.VehicleRegistration} not found.");
         

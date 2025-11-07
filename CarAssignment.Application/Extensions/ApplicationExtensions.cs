@@ -12,6 +12,7 @@ public static class ApplicationExtensions
     {
         services.AddTransient<IPaymentService, PaymentService>();
         services.AddTransient<IParkingService, ParkingService>();
-        services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+        services.AddScoped<IParkingSlotRepository, ParkingSlotRepository>();
+        services.AddScoped<ICarRepository, CarRepository>();
     }
 }

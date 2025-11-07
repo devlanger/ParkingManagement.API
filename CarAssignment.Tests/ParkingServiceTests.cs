@@ -4,138 +4,104 @@ using CarAssignment.Core.Configuration;
 using CarAssignment.Core.Data;
 using CarAssignment.Core.Data.Enums;
 using CarAssignment.Core.Exceptions;
-using CarAssignment.Infrastructure.Database;
+using CarAssignment.Infrastructure;
 using Microsoft.Extensions.Options;
 using Moq;
 
 namespace CarAssignment.Tests;
 
-public class ParkingServiceTests : TestBase
+public class ParkingServiceTests
 {
-    private readonly IOptions<ParkingConfiguration> _parkingConfiguration;
+    private readonly Mock<IOptions<ParkingConfiguration>> _parkingConfigurationMock = new();
+    private readonly Mock<IParkingSlotRepository> _parkingSlotRepositoryMock = new();
+    private readonly Mock<ICarRepository> _carRepositoryMock = new();
 
-    private readonly Mock<ParkingDbContext> _mockParkingDbContext;
-    private readonly IParkingService _parkingService;
-    
+    private readonly IParkingService _sut;
+
     public ParkingServiceTests()
     {
-        var carRepositoryMock = CreateRepositoryMock<Car>();
-        var parkingSlotRepositoryMock = CreateRepositoryMock<ParkingSlot>();
-        _mockParkingDbContext = new Mock<ParkingDbContext>();
-
-        _parkingConfiguration = Options.Create(new ParkingConfiguration()
-        {
-            ParkingSlotCount = 5,
-            AdditionalChargeParkingSlotsAmount = 5
-        });
-        
-        _parkingService = new ParkingService(carRepositoryMock.Object,
-            parkingSlotRepositoryMock.Object,
-            _parkingConfiguration,
-            _mockParkingDbContext.Object);
-        
-        SeedParkingSlots();
+        _sut = new ParkingService(_carRepositoryMock.Object,
+            _parkingSlotRepositoryMock.Object,
+            _parkingConfigurationMock.Object);
     }
 
-    private void SeedParkingSlots()
-    {
-        var parkingSlots = new List<ParkingSlot>();
-        for (var i = 0; i < _parkingConfiguration.Value.ParkingSlotCount; i++)
-        {
-            parkingSlots.Add(new ParkingSlot());
-        }
-        
-        SeedEntities(parkingSlots.ToArray());
-    }
-    
     [Fact]
     public async Task ThrowException_WhenAddingExistingCar()
     {
+        //Arrange
         var car = new Car
         {
             RegistrationNumber = "test",
             VehicleType = VehicleType.LARGE_CAR,
             ParkingEnterTime = DateTimeOffset.UtcNow
         };
+
+        _parkingSlotRepositoryMock.Setup(x =>
+                x.GetParkingSlotAsync(It.IsAny<string>()))
+            .ReturnsAsync(new ParkingSlot()
+            {
+                CarId = car.Id
+            });
+
+        _parkingSlotRepositoryMock.Setup(x => x.GetFreeParkingSlotAsync()).ReturnsAsync(new ParkingSlot());
         
-        SeedEntities(car);
-        SeedEntities(new ParkingSlot()
-        {
-            CarId = car.Id
-        });
-        
-        await Assert.ThrowsAsync<ConflictException>(() => 
-            _parkingService.AllocateCarAsync("test", VehicleType.LARGE_CAR, CancellationToken.None));
+        //Assert
+        await Assert.ThrowsAsync<ConflictException>(() =>
+            _sut.AllocateCarAsync("test", VehicleType.LARGE_CAR, CancellationToken.None));
     }
-    
+
     [Fact]
     public async Task AdditionalCharge_IsTrue_WhenAllocatingCarWithAvailableSlotAmountLessThan()
     {
         //Arrange
-        var availableSlotsToTakeCharge = 6;
-        
-        ClearEntities<Car>();
-
-        var entities = new List<Car>();
-        for (var i = 0; i < availableSlotsToTakeCharge; i++)
-        {
-            entities.Add(new Car
+        _parkingConfigurationMock
+            .Setup(x => x.Value)
+            .Returns(new ParkingConfiguration()
             {
-                RegistrationNumber = $"test-{i}",
-                VehicleType = VehicleType.LARGE_CAR,
-                ParkingEnterTime = DateTimeOffset.UtcNow
+                AdditionalChargeParkingSlotsAmount = 5
             });
+        
+        for (var i = 0; i < 6; i++)
+        {
+            _parkingSlotRepositoryMock.Setup(x =>
+                    x.GetParkingSlotAsync($"reg-{i}"))
+                .ReturnsAsync(
+                    new ParkingSlot()
+                    {
+                        Id = i,
+                        CarId = i
+                    });
+
+            _parkingSlotRepositoryMock.Setup(x =>
+                x.GetFreeParkingSlotAsync()).ReturnsAsync(new ParkingSlot());
         }
-        
-        SeedEntities(entities.ToArray());
-        
-        var allocatedCar = await _parkingService.AllocateCarAsync("test-123", VehicleType.LARGE_CAR, CancellationToken.None);
-        
+
+        //Act
+        var allocatedCar =
+            await _sut.AllocateCarAsync("test-123", VehicleType.LARGE_CAR, CancellationToken.None);
+
+        //Assert
         Assert.True(allocatedCar.ChargeAdditional);
     }
-    
+
     [Fact]
     public async Task ThrowException_WhenRemovingNonExistingCar()
     {
-        ClearEntities<Car>();
-
-        SeedEntities(new Car
-        {
-            RegistrationNumber = "test",
-            VehicleType = VehicleType.LARGE_CAR,
-            ParkingEnterTime = DateTimeOffset.UtcNow
-        });
-        
-        await Assert.ThrowsAsync<NotFoundException>(() => 
-            _parkingService.DeallocateCarAsync("non-existing-test", CancellationToken.None));
+        //Assert
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            _sut.DeallocateCarAsync("non-existing-reg", CancellationToken.None));
     }
-    
+
     [Fact]
     public async Task ThrowException_WhenNoAvailableSpace()
     {
-        ClearEntities<Car>();
-
-        var entities = new List<Car>();
-        for (var i = 0; i < _parkingConfiguration.Value.ParkingSlotCount; i++)
-        {
-            entities.Add(new Car
-            {
-                RegistrationNumber = $"test-{i}",
-                VehicleType = VehicleType.LARGE_CAR,
-                ParkingEnterTime = DateTimeOffset.UtcNow
-            });
-        }
+        //Arrange
+        _parkingSlotRepositoryMock.Setup(x => 
+            x.GetFreeParkingSlotAsync())
+            .ReturnsAsync(() => null);
         
-        SeedEntities(entities.ToArray());
-        
-        await Assert.ThrowsAsync<NotAvailableSpaceException>(() => 
-            _parkingService.AllocateCarAsync("test-9999", It.IsAny<VehicleType>(), CancellationToken.None));
-    }
-
-    public override void Dispose()
-    {
-        ClearEntities<ParkingSlot>();
-        ClearEntities<Car>();
-        base.Dispose();
+        //Assert
+        await Assert.ThrowsAsync<NotAvailableSpaceException>(() =>
+            _sut.AllocateCarAsync("test-9999", It.IsAny<VehicleType>(), CancellationToken.None));
     }
 }

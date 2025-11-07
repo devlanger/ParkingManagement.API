@@ -5,7 +5,7 @@ using CarAssignment.Infrastructure;
 
 namespace CarAssignment.Application.Services;
 
-public class PaymentService(IParkingService parkingService, IRepository<Car> carRepository) : IPaymentService
+public class PaymentService(IParkingService parkingService, ICarRepository carRepository) : IPaymentService
 {
     public async Task<double> ChargeCar(Car carToCharge)
     {

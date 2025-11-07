@@ -28,7 +28,6 @@
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=927d2e2e_002Dee7c_002D4271_002D86ea_002Db8fa32e371c8/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ThrowException_WhenAddingExistingCar #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::CD623BC8-4B1F-42C1-8EF4-FAA25E151310::net8.0::CarAssignment.Tests.ParkingServiceTests.ThrowException_WhenAddingExistingCar&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::CD623BC8-4B1F-42C1-8EF4-FAA25E151310::net8.0::CarAssignment.Tests.ParkingServiceTests.AdditionalCharge_IsTrue_WhenAllocatingCarWithAvailableSlotAmountLessThan&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::CD623BC8-4B1F-42C1-8EF4-FAA25E151310::net8.0::CarAssignment.Tests.ParkingServiceTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
