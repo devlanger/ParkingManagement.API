@@ -5,10 +5,9 @@ A lightweight and extensible API for managing parking spots, cars, and assignmen
 ---
 
 ### TODO Checklist:
-- [ ] Remove generic repository and implement dedicated ones (Breaks DDD and considered anti-pattern)
+- [x] Remove generic repository and implement dedicated ones (Breaks DDD and considered anti-pattern)
 - [ ] Add Unit of Work pattern
 - [ ] Make sure query calls to repository are projected and not all columns are selected if not required
-- 
 
 ---
 
