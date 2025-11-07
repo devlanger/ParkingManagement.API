@@ -1,0 +1,36 @@
+name: .NET Core Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Setup .NET SDK (you can change the version)
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      # 3. Restore dependencies
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # 4. Build the project
+      - name: Build project
+        run: dotnet build --no-restore --configuration Release
+
+      # 5. Run all tests
+      - name: Run tests
+        run: dotnet test --no-build --configuration Release --verbosity normal
