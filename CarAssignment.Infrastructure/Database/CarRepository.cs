@@ -8,14 +8,12 @@ public class CarRepository(ParkingDbContext dbContext) : ICarRepository
     public async Task AddAsync(Car entity)
     {
         await dbContext.Set<Car>().AddAsync(entity);
-        await dbContext.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(Car entity)
+    public void Update(Car entity)
     {
         dbContext.Set<Car>().Attach(entity);
         dbContext.Set<Car>().Entry(entity).State = EntityState.Modified;
-        await dbContext.SaveChangesAsync();
     }
 
     public void Delete(Car entity)

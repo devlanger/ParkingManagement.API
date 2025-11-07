@@ -1,17 +1,18 @@
 ﻿using CarAssignment.Core.Abstractions;
 using CarAssignment.Core.Data;
 using CarAssignment.Core.Factories;
-using CarAssignment.Infrastructure;
 
 namespace CarAssignment.Application.Services;
 
-public class PaymentService(IParkingService parkingService, ICarRepository carRepository) : IPaymentService
+public class PaymentService(IParkingService parkingService, IUnitOfWork unitOfWork) : IPaymentService
 {
     public async Task<double> ChargeCar(Car carToCharge)
     {
         var chargeAmount = GetAmountForParking(carToCharge);
         carToCharge.ChargeAmount = chargeAmount;
-        await carRepository.UpdateAsync(carToCharge);
+        unitOfWork.CarRepository.Update(carToCharge);
+        await unitOfWork.SaveChangesAsync();
+        
         return chargeAmount;
     }
     

@@ -1,4 +1,5 @@
-﻿using CarAssignment.Infrastructure.Database;
+﻿using CarAssignment.Core.Abstractions;
+using CarAssignment.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,8 @@ public static class InfrastructureCollectionExtensions
     {
         services.AddDbContext<ParkingDbContext>(options =>
             options.UseSqlServer(configurationManager.GetConnectionString("DefaultConnection")));
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 
     public static async Task AddMigrations(this IServiceProvider serviceProvider)

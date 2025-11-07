@@ -5,7 +5,7 @@ namespace CarAssignment.Infrastructure;
 public interface IParkingSlotRepository
 {
     Task AddAsync(ParkingSlot entity);
-    Task UpdateAsync(ParkingSlot entity);
+    void Update(ParkingSlot entity);
     void Delete(ParkingSlot entity);
     Task<ParkingSlot?> GetByIdAsync(string id);
     

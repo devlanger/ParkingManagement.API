@@ -15,14 +15,16 @@ public class ParkingServiceTests
     private readonly Mock<IOptions<ParkingConfiguration>> _parkingConfigurationMock = new();
     private readonly Mock<IParkingSlotRepository> _parkingSlotRepositoryMock = new();
     private readonly Mock<ICarRepository> _carRepositoryMock = new();
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     private readonly IParkingService _sut;
 
     public ParkingServiceTests()
     {
-        _sut = new ParkingService(_carRepositoryMock.Object,
-            _parkingSlotRepositoryMock.Object,
-            _parkingConfigurationMock.Object);
+        _unitOfWorkMock.Setup(x => x.CarRepository).Returns(_carRepositoryMock.Object);
+        _unitOfWorkMock.Setup(x => x.ParkingSlotRepository).Returns(_parkingSlotRepositoryMock.Object);
+        
+        _sut = new ParkingService(_unitOfWorkMock.Object, _parkingConfigurationMock.Object);
     }
 
     [Fact]

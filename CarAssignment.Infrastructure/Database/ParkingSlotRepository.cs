@@ -8,14 +8,12 @@ public class ParkingSlotRepository(ParkingDbContext dbContext) : IParkingSlotRep
     public async Task AddAsync(ParkingSlot entity)
     {
         await dbContext.Set<ParkingSlot>().AddAsync(entity);
-        await dbContext.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(ParkingSlot entity)
+    public void Update(ParkingSlot entity)
     {
         dbContext.Set<ParkingSlot>().Attach(entity);
         dbContext.Set<ParkingSlot>().Entry(entity).State = EntityState.Modified;
-        await dbContext.SaveChangesAsync();
     }
 
     public void Delete(ParkingSlot entity)
